@@ -56,6 +56,8 @@ router.post('/signup', async (req, res) => {
         const token = await addUser(email, password);
         res.status(201).send({ token });
     } catch (e) {
+        console.log(e);
+
         res.status(409).send();
     }
 })

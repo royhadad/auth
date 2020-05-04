@@ -2,7 +2,7 @@ const validator = require('validator');
 const MIN_PASSWORD_LENGTH = 6;
 
 const isValidEmail = (email) => {
-    if (email && validator.isEmail(value)) {
+    if (email && validator.isEmail(email)) {
         return true;
     } else {
         return false;
