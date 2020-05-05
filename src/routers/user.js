@@ -3,12 +3,12 @@ const {
     addUser,
     findUserByCredentials,
     findUserById,
-    findUserByIdAndToken,
-    generateAuthToken,
+    saveNewAuthToken,
     removeAuthToken
 } = require('../models/user');
 const { isValidEmail, isValidPassword } = require('../utils/validators');
 const auth = require('../middleware/auth');
+const chalk = require('chalk');
 const router = new express.Router()
 
 router.post('/login', async (req, res) => {
@@ -18,7 +18,11 @@ router.post('/login', async (req, res) => {
         if (!(isValidEmail(email) && isValidPassword(password))) {
             return res.status(400).send();
         }
-        const token = await findUserByCredentials(email, password);
+        const user = await findUserByCredentials(email, password);
+        if (!user) {
+            throw new Error();
+        }
+        const token = await saveNewAuthToken(user.id);
         if (!token) {
             throw new Error();
         }
@@ -56,9 +60,12 @@ router.post('/signup', async (req, res) => {
         const token = await addUser(email, password);
         res.status(201).send({ token });
     } catch (e) {
-        console.log(e);
-
-        res.status(409).send();
+        if (e.name === 'SequelizeUniqueConstraintError') {
+            res.status(409).send();
+        } else {
+            console.log(chalk.red(e));
+            res.status(500).send();
+        }
     }
 })
 

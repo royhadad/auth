@@ -1,5 +1,4 @@
 const chalk = require('chalk');
-const mysql = require('mysql/promise');
 const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(
@@ -11,11 +10,12 @@ const sequelize = new Sequelize(
         dialect: 'mysql'
     });
 
-try {
-    await sequelize.authenticate();
-    console.log(chalk.green('connected!'));
-} catch (e) {
-    console.log(chalk.red('unable to connect to DB:', e));
-}
+sequelize.authenticate()
+    .then(() => {
+        console.log(chalk.green('connected!'));
+    })
+    .catch((e) => {
+        console.log(chalk.red('unable to connect to DB:', e));
+    })
 
 module.exports = sequelize;
